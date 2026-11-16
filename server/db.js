@@ -1,8 +1,20 @@
+import dns from 'node:dns';
 import mongoose from 'mongoose';
 import { log } from './utils/logger.js';
 import { Booking } from './models/Booking.js';
 import { User } from './models/User.js';
 import { Inquiry } from './models/Inquiry.js';
+
+// Some home routers / Windows setups refuse the DNS SRV lookups Node sends directly,
+// so `mongodb+srv://` only fails on the developer's machine. Use public resolvers outside
+// production; hosting platforms (Render, Railway, …) resolve SRV normally.
+if (process.env.NODE_ENV !== 'production') {
+  try {
+    dns.setServers(['1.1.1.1', '8.8.8.8']);
+  } catch {
+    /* ignore — keep the system resolver */
+  }
+}
 
 mongoose.set('strictQuery', true);
 
