@@ -1,0 +1,53 @@
+# Render Blueprint — one Node web service that serves the website (dist/) and the API.
+# Deploy: push this repo to GitHub, then in Render choose "New → Blueprint" and pick the repo.
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: wild-yala-safari
+    runtime: node
+    plan: free # change to "starter" for an always-on site (free spins down after 15 min idle)
+    region: singapore # closest Render region to Sri Lanka
+    branch: main
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY
+        value: "1"
+      # Public address of the site (no trailing slash). Set in the Render dashboard.
+      - key: SITE_URL
+        sync: false
+      # MongoDB Atlas connection string. Set in the Render dashboard (secret).
+      - key: MONGODB_URI
+        sync: false
+      # >= 32 random characters. Generate: node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+      - key: JWT_SECRET
+        sync: false
+      # --- PayHere (fill in from your PayHere merchant account; use live mode for real payments)
+      - key: PAYHERE_MODE
+        value: sandbox
+      - key: PAYHERE_MERCHANT_ID
+        sync: false
+      - key: PAYHERE_MERCHANT_SECRET
+        sync: false
+      # --- SMTP e-mail (Brevo / Mailgun / Gmail app password / your domain mailbox)
+      - key: EMAIL_HOST
+        sync: false
+      - key: EMAIL_PORT
+        value: "587"
+      - key: EMAIL_SECURE
+        value: "false"
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASSWORD
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      # --- optional: only if the site is visited from additional origins
+      - key: CORS_ORIGINS
+        sync: false
